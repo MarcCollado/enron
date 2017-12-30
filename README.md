@@ -1,4 +1,4 @@
-# Identify Fraud from Enron Email
+# Identify Fraud From Enron Email
 #### Udacity Data Analyst Nanodegree — Project 7
 
 ## Introduction
@@ -7,31 +7,31 @@ In 2000, Enron was one of the largest companies in the United States. By 2002, i
 Using all the concepts and ideas learned through the *Introduction to Machine Learning* module within the Udacity's Data Analyst NanoDegree, this project will use the `scikit-learn` [Python library](http://scikit-learn.org/stable/) and machine learning techniques to predict and spot culpable persons of the Enron scandal.
 
 ## How The Project Works
-The project contains three main folders:
+The project contains four main folders:
 
-* code: contains all the scripts
-* data: contains all the datasets used throughout the project
-* misc: several assets, such as images, generated to illustrate the README.md
-* tools: support functions for the main scripts
+* `code`: Python main scripts
+* `data`: data sets used throughout the project
+* `misc`: several assets, such as images, generated to illustrate the `README.md`
+* `tools`: support functions for the main scripts
 
-As mentioned before, the `code` folder contains all the scripts that run the project. The main script is `poi_id.py` which needs to be run first in order to generate the models for `tester.py` to yield the right results.
+The `code` folder contains all the scripts that run the project. The main script is `poi_id.py` which needs to be run first in order to generate the models for `tester.py` to yield the right results.
 
-Besides `poi_id.py` all the `poi_*.py` contain the functions called from the main script. Their "surname" describe which function each file tackles and which stage of the project belongs.
+Besides `poi_id.py` all the `poi_*.py` scripts contain the functions called from the main script. Their "surname" describe which section each file tackles and which stage of the project the code belongs.
 
-> i.e. the poi_plot.py contains all the plotting functions, while the poi_explore.py contains all the functions used during the feature exploration phase.
+> i.e. the `poi_plot.py` contains all the plotting functions, while the `poi_explore.py` contains all the functions used during the feature exploration phase.
 
-Therefore, the final structure of the code is the following:
+The final structure of the code is the following:
 
-* poi_id.py
-  * poi_plot.py
-  * poi_explore.py
-  * poy_select.py
-  * poy_tune.py
-* tester.py
+* `poi_id.py`: main script, which shares the structure with `README.md`
+  * `poi_plot.py`: contains all the plotting functions
+  * `poi_explore.py`: contains all the functions related to the data exploration
+  * `poy_select.py`: contains all the functions related to the feature selection
+  * `poy_tune.py`: contains all the functions related to algorithm tuning
+* `tester.py`: script used to test the algorithm performance
 
-All the project questions are answered directly in the README.md document. Despite README.md contains plenty of code snippets, the project flow has been designed to jump between README.md and `poi_*.py` files for further reference and in order to better understand the code being discussed at any given time.
+All the project questions are answered directly in the `README.md` document. Despite `README.md` contains plenty of code snippets, the project flow has been designed to jump between `README.md` and `poi_*.py` scripts for further reference and in order to better understand the code being discussed at any given time.
 
-In order to facilitate readability, both README.md and `poi_*.py` files share the same structure:
+In order to facilitate readability, both `README.md` and `poi_*.py` files share the same structure:
 
 * Data Exploration: related to *data exploration* and *outlier detection*.
 * Selected Features: related to *create new features*, *intelligently select features* and *properly scale features*.
@@ -39,11 +39,11 @@ In order to facilitate readability, both README.md and `poi_*.py` files share th
 * Final Model
 
 ### Other Things You Should Know
-In the main script, `poi_id.py`, line 15, there are some `print_*` knobs. Their main use is to turn on/off different printing functions of the code, in order to avoid dozens of lines appearing in the console when running `poi_id.py`.
+In the main script, `poi_id.py`, line 15, you'll find the `print_*` knobs. Their main use is to turn on/off different printing functions of the code, in order to avoid dozens of lines appearing in the console when running `poi_id.py`.
 
-All the functions called from `poi_id.py` are wrapped inside a conditional statement that points to these Booleans.
+All the printing functions called from `poi_id.py` are wrapped inside a conditional statement that points to these Booleans.
 
-The variables are also segmented. The gist of it being that if you wanted to print in the console only the code from the Data Exploration phase, you should only "turn" the switch `print_explore` to `True`.
+The printing variables themselves are also segmented. The gist of it being that if you wanted to print only the code from the Data Exploration phase, you should only "turn" the switch `print_explore` to `True`.
 
 From a functionality perspective, all the work is done regardless of these switches, then its use is merely cosmetic and should not affect the final results.
 
@@ -53,11 +53,11 @@ From a functionality perspective, all the work is done regardless of these switc
 The main goal of this project is to use both financial and email data from Enron to build a predictive model that could potentially identify a "person of interest" (POI), i.e. Enron employees who may have committed fraud, based on the aforementioned public data.
 
 ### Data Structure
-Here's how this data looks like: as part of the preprocessing for this project, the email and financial data from Enron has been combined into a dictionary, where each key-value pair corresponds to one person.
+As part of the preprocessing for this project, the email and financial data from Enron has been combined into a dictionary, where each key-value pair corresponds to one person.
 
-Therefore, the dictionary key is the person's name, and the value is another dictionary, which contains the names of all the features and their values for that person.
+The dictionary key is the person's name, and the value is another dictionary, which contains the names of all the features and their values for that person.
 
-Additionally, the features in the data fall into three major types:
+Additionally, the features always fall into three major types:
 
 * Financial features (all units in US dollars):
   * `salary`
@@ -74,7 +74,7 @@ Additionally, the features in the data fall into three major types:
   * `long_term_incentive`
   * `restricted_stock`
   * `director_fees`
-* Email features (units are number of emails messages; except ‘email_address’, which is a text string):
+* Email features (units are number of emails messages; except `email_address`, which is a text string):
   * `to_messages`
   * `email_address`
   * `from_poi_to_this_person`
@@ -120,7 +120,7 @@ A quick overview of the dataset provides some highlights about its structure and
 * Percentage of POI: 12.3%
 
 ### NaNs
-Despite having really valuable information in order to identify POIs, the dataset contained a lot of missing values — NaN.
+Despite overall having really valuable information in order to identify POIs, the dataset also contained a lot of missing values — NaN.
 
 Here's a table showing the amount of NaN values per feature.
 
@@ -149,7 +149,7 @@ Here's a table showing the amount of NaN values per feature.
 
 The data definitely has a lot of NaNs, the most concerning features are `Loan advances`, `Director fees` and `Restricted stock deferred`, which have more than 85% of their values missing.
 
-At this point no data won't be discarded, waiting until further Feature Selection to spot the most influential features. Despite, for the financial features, one way to interpret the NaNs is that they are equivalent to a zero.
+At this point no data will be discarded, waiting until further Feature Selection to spot the most influential features. Despite, for the financial features, one way to interpret the NaNs is that they are equivalent to a zero.
 
 There is a case to be made that if an employee did not receive restricted stock, the value could be zero. On top of that, this hypothesis is also supported by the `insider-pay.pdf`, that can be found in the `misc` folder, in how the totals are calculated.
 
@@ -203,7 +203,7 @@ The image below plots the amount of email `from_messages` and `to_messages` sent
 
 This plot does appear to contain some outliers. There are three suspicious persons that send / receive way more email than what would be considered average.
 
-For example, the farthest point on the right sent over 14000 emails, with the closest being less then a half. The points outside the main cluster are identified below.
+For example, the farthest point on the right sent over 14000 emails, with the closest being less than a half. The points outside the main cluster are identified below.
 
 ```
   ['KAMINSKI WINCENTY J',
@@ -575,7 +575,7 @@ Under these conditions the algorithm performed at its best, getting the followin
 * Recall: 22%
 
 
-Remarkably it got a pretty high accuracy, the best among the three tested algorithms, despite it felt short in terms of precision and accuracy.
+Remarkably it got a pretty high accuracy, the best among the three tested algorithms, despite it felt short in terms of precision and recall.
 
 It got a precision of more than 42%, which means that out of all the items labeled as positive, how many the algorithm identified as truly belong to the positive class.
 
