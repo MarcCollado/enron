@@ -10,12 +10,13 @@ sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 # Switch to True to display the main features of the Exploration
 print_plot = False
 print_explore = False
-print_select = True
+print_select = False
+print_tune = False
 
 # Load the dictionary containing the dataset
 with open("../data/final_project_dataset.pkl", "r") as data_file:
@@ -101,7 +102,7 @@ features_list = ["poi",
 
 # Get Accuracy, Precision and Recall from the three algorithms
 if print_select:
-    poi_select.test_classifier(data_dict, features_list, 0.2)
+    poi_select.test_clf(data_dict, features_list, 0.2)
 
 # Create new engineered features
 # f_bonus
@@ -156,7 +157,7 @@ features_list = ["poi",
 
 # Get Accuracy, Precision and Recall from the three algorithms
 if print_select:
-    poi_select.test_classifier(data_dict, features_list, 0.2)
+    poi_select.test_clf(data_dict, features_list, 0.2)
 
 # Get the importance of each feature for AB and RF
 if print_select:
@@ -202,12 +203,21 @@ features_list_RF = ["poi",
 
 # Get Accuracy, Precision and Recall with the optimized dataset
 if print_select:
-    poi_select.test_classifier(data_dict, features_list_AB, 0.2)
-    poi_select.test_classifier(data_dict, features_list_RF, 0.2)
+    poi_select.test_clf(data_dict, features_list_AB, 0.2)
+    poi_select.test_clf(data_dict, features_list_RF, 0.2)
 
+
+# PART 3: Algorithm Tuning
+# Related file: poi_tune.py
+
+# Fine tune the classifiers
+if print_tune:
+    poi_tune.rf_tune(data_dict, features_list, True)
+    poi_tune.ab_tune(data_dict, features_list, True)
+    poi_tune.svc_tune(data_dict, features_list)
 
 # Code Review: store to my_dataset and feature_list for easy export below
-clf = RandomForestClassifier()
+clf = AdaBoostClassifier(n_estimators=50)
 my_dataset = data_dict
 features_list = ["poi",
                  "salary",
@@ -231,22 +241,5 @@ features_list = ["poi",
                  "r_from",
                  "r_to"
                  ]
-
-### Task 5: Tune your classifier to achieve better than .3 precision and recall
-### using our testing script. Check the tester.py script in the final project
-### folder for details on the evaluation method, especially the test_classifier
-### function. Because of the small size of the dataset, the script uses
-### stratified shuffle split cross validation. For more info:
-### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
-
-# Example starting point. Try investigating other evaluation techniques!
-# from sklearn.cross_validation import train_test_split
-# features_train, features_test, labels_train, labels_test = \
-#     train_test_split(features, labels, test_size=0.3, random_state=42)
-
-### Task 6: Dump your classifier, dataset, and features_list so anyone can
-### check your results. You do not need to change anything below, but make sure
-### that the version of poi_id.py that you submit can be run on its own and
-### generates the necessary .pkl files for validating your results.
 
 dump_classifier_and_data(clf, my_dataset, features_list)

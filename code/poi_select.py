@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.cross_validation import train_test_split
 
 
-def test_classifier(d, features_list, test_size, random_state=42):
+def test_clf(d, features_list, test_size, random_state=42):
     """
     Prints the accuracy, precision and recall for a given classifier.
     """
@@ -56,7 +56,7 @@ def test_classifier(d, features_list, test_size, random_state=42):
 # Split the data using sklearn.cross_validation
 def split_data(features, labels, test_size, random_state=42):
     """
-    Support function for test_classifier() that returns features and labels
+    Support function for test_clf() that returns features and labels
     for both training and testing sets.
 
     Args:

@@ -9,29 +9,43 @@ Using all the concepts and ideas learned through the *Introduction to Machine Le
 ## How The Project Works
 The project contains three main folders:
 
-* code
-* data
-* misc
-* tools
+* code: contains all the scripts
+* data: contains all the datasets used throughout the project
+* misc: several assets, such as images, generated to illustrate the README.md
+* tools: support functions for the main scripts
 
-The `code` folder contains all the scripts that run the project.
+As mentioned before, the `code` folder contains all the scripts that run the project. The main script is `poi_id.py` which needs to be run first in order to generate the models for `tester.py` to yield the right results.
+
+Besides `poi_id.py` all the `poi_*.py` contain the functions called from the main script. Their "surname" describe which function each file tackles and which stage of the project belongs.
+
+> i.e. the poi_plot.py contains all the plotting functions, while the poi_explore.py contains all the functions used during the feature exploration phase.
+
+Therefore, the final structure of the code is the following:
 
 * poi_id.py
+  * poi_plot.py
   * poi_explore.py
   * poy_select.py
   * poy_tune.py
+* tester.py
 
-All the project questions are answered directly in the README.md document. Despite README.md contains plenty of code snippets, the project flow has been designed to jump between README.md and poi_*.py files for further reference and in order to better understand the code being discussed at any given time.
+All the project questions are answered directly in the README.md document. Despite README.md contains plenty of code snippets, the project flow has been designed to jump between README.md and `poi_*.py` files for further reference and in order to better understand the code being discussed at any given time.
 
-In order to facilitate readability, both README.md and poi_*.py files share the same structure:
+In order to facilitate readability, both README.md and `poi_*.py` files share the same structure:
 
 * Data Exploration: related to *data exploration* and *outlier detection*.
 * Selected Features: related to *create new features*, *intelligently select features* and *properly scale features*.
-* Algorithm Tuning: related to *parameter tuning* and *tune the algorithm*.
+* Algorithm Tuning: related to *parameter tuning* and *validation strategy*.
+* Final Model
 
 ### Other Things You Should Know
-* `print_*` functions
+In the main script, `poi_id.py`, line 15, there are some `print_*` knobs. Their main use is to turn on/off different printing functions of the code, in order to avoid dozens of lines appearing in the console when running `poi_id.py`.
 
+All the functions called from `poi_id.py` are wrapped inside a conditional statement that points to these Booleans.
+
+The variables are also segmented. The gist of it being that if you wanted to print in the console only the code from the Data Exploration phase, you should only "turn" the switch `print_explore` to `True`.
+
+From a functionality perspective, all the work is done regardless of these switches, then its use is merely cosmetic and should not affect the final results.
 
 ## Data Exploration
 > Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the dataset and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?
@@ -135,7 +149,7 @@ Here's a table showing the amount of NaN values per feature.
 
 The data definitely has a lot of NaNs, the most concerning features are `Loan advances`, `Director fees` and `Restricted stock deferred`, which have more than 85% of their values missing.
 
-At this point no data won't be discarded, waiting until the Feature Selection through `SelectKBest` to spot the most influential features. Despite, for the financial features, one way to interpret the NaNs is that they are equivalent to a zero.
+At this point no data won't be discarded, waiting until further Feature Selection to spot the most influential features. Despite, for the financial features, one way to interpret the NaNs is that they are equivalent to a zero.
 
 There is a case to be made that if an employee did not receive restricted stock, the value could be zero. On top of that, this hypothesis is also supported by the `insider-pay.pdf`, that can be found in the `misc` folder, in how the totals are calculated.
 
@@ -411,41 +425,162 @@ So far, the best performing algorithm has been RandomForest with the addition  o
 
 Regardless, the Precision under such circumstances seem utterly unrealistic, and due to chance as a consequence of a small test set. Changing the test size can have a great impact on the precision, ranging from values from 0.66 to 1.
 
-The performance metrics of this algorithm under these conditions has been:
 
-**RandomForest**
-* Accuracy: 0.857142857143
-* Precision: 0.666666666667
-* Recall: 0.4
-
-Therefore, RandomForest, as the most solid and best performing algorithm (close call with AdaBoost here), will be fine tuned and used in the final analysis.
-
-
-## Algorithm Tuning
+## Algorithm Tuning and Validation
 > What does it mean to tune the parameters of an algorithm, and what can happen if you don’t do this well?  How did you tune the parameters of your particular algorithm? What parameters did you tune?
 
 First of all, in order to support feature scaling and parameter tuning, `sklearn`'s `Pipeline` and `GridSearchCV` modules will be implemented.
 
-Every machine learning algorithm has several parameters at its disposal in order to model the results depending on the case to be studied. Parameter tuning is a really important step when it comes to analyze data sets through machine learning algorithms. Since each data set has its own uniqueness, it has to be tackled under a specific set of conditions or parameters in order to get optimal results.
+Every machine learning algorithm has several parameters at its disposal in order to model the results depending on the situation is dealing with. Parameter tuning is a really important part when it comes to analyze data sets through machine learning algorithms. Since each data set has its own uniqueness, it has to be tackled under a specific set of conditions or parameters in order to get optimal results.
 
 Then the goal of researchers is to find the parameters that yield optimal performance for each circumstance. Of course this task can be done manually, but in some occasions the the amount of parameter combinations can be overwhelming. Here's where `GridSearchCV` enters the picture.
 
 `GridSearchCV` module automates this process by recursively trying several parameter combination and provide the most optimal result.
 
+Several combinations for each algorithm have been tested. The results have been benchmarked through the `tester.py` script provided by the project.
+
+### RandomForest and AdaBoost
+The tune process for both algorithms has been similar, and the results almost identical.
+
+They were tested using `rf_tune()` and `ab_tune()` respectively. Tests were performed with and without scaler, which made little difference in RandomForest and no difference in AdaBoost.
+
+Also `n_estimators` parameter was iterated, with values ranging from 1 to 200. The sweet spot was found around 3 and 10, being 5 the value that yielded the best results.
+
+Finally, several scores were test against. The one that produced the best results was `F1`, which stroke a healthy balance between recall and precision. This fact shouldn't come as a surprise since this is its main definition, according to the Wikipedia:
+
+> F1 score considers both the precision p and the recall r of the test to compute the score. [...] Is the harmonic average of the precision and recall, where an F1 score reaches its best value at 1 (perfect precision and recall) and worst at 0.
+
+It is also worth noting that both samples, with or without scaler, produced the same parameters. Here's a code snippet of the best estimator derived from Pipeline, both for RandomForest and AdaBoost.
+
+```
+# RandomForestClassifier
+Pipeline(steps=[('rf', RandomForestClassifier(bootstrap=True,
+            class_weight=None, criterion='gini',
+            max_depth=None, max_features='auto', max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            n_estimators=5, n_jobs=1, oob_score=False, random_state=None,
+            verbose=0, warm_start=False))])
+
+# AdaBoostClassifier
+Pipeline(steps=[('ab', AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0, n_estimators=5, random_state=None))])
+```
+
+### SVC
+Support Vector Machines algorithm went through a similar optimization process, but with more focus on the parameters, since `Pipeline` allowed more customization when it came to SVM.
+
+After several tries with mixed results, here's the best `param_grid` that could be put together in order to tune the algorithm.
+
+```
+{
+ 'svm__C': [1, 50, 100, 1000],
+ 'svm__gamma': [0.5, 0.1, 0.01],
+ 'svm__degree': [1, 2],
+ 'svm__kernel': ['rbf', 'poly']
+}
+```
+
+The results were pretty much in line with the rest of algorithms, but the scaler definitely helped get the Precision and Recall measurements off the ground.
+
+The parameters that yielded the best results were the following:
+
+```
+C=50
+cache_size=200
+class_weight=None
+coef0=0.0,
+decision_function_shape=None
+degree=1,
+gamma=0.5,
+kernel='poly',
+max_iter=-1,
+probability=False,
+random_state=None,
+shrinking=True,
+tol=0.001,
+verbose=False
+```
+
+> What is validation, and what’s a classic mistake you can make if you do it wrong? How did you validate your analysis?
+
+Validation is the set of techniques to make sure the model performs well in a wide range of situations, and it's not just optimized for a particular data set or conditions.
+
+As seen during the DAND, a classic mistake if your model is not validates and only trained in one set of data, is overfitting.
+
+This phenomena can be studied adjusting the amount of data points assigned to both training and testing sets. The most common way to test for it is with cross validation, a technique that dynamically assigns a percentage to the different sets.
+
+Actually, this feature was already implemented from the get go in `poi_select.py` through the `train_test_split` module.
 
 
+## Final Model
+Finally, here's the table that sums everything up:
 
-As mentioned in the Pre Selection section, both preselected and engineered features will be combined and put into `scikit-learn`'s `SelectKBest` module to compute the 10 most influential features.
+| Metric    | RF | RF w/ scaler | AB | AB w/ scaler | SVM w/ scaler |
+|:------:|:--:|:------------:|:--:|:------------:|:-------------:|
+| Accuracy  | 0.84  | 0.84 | 0.85 | 0.85 | 0.83 |
+| Precision | 0.39  | 0.39 | 0.42 | 0.42 | 0.34 |
+| Recall    | 0.20  | 0.22 | 0.22 | 0.22 | 0.19 |
+| F1        | 0.26  | 0.28 | 0.29 | 0.29 | 0.24 |
+| F2        | 0.22  | 0.24 | 0.25 | 0.25 | 0.21 |
+|   True +  | 400   | 431  | 447  | 449  | 379 |
+|   False + | 629   | 669  | 605  | 608  | 736 |
+|   False - | 1600  | 1569 | 1553 | 1551 | 1621 |
+|   True -  | 11371 | 11331 | 11395 | 11392 | 11264 |
+
+After the tuning process and comparing the performance of the different algorithms, under a different set of conditions and parameters, AdaBoost, in a close call, appears to be the best performing in most of the measurements.
+
+Therefore, AdaBoost will be the candidate for submission in the final analysis with the following parameters:
+
+No use of a scaler (actually it makes no difference, but it saves computational cost).
+
+Optimized parameters for the classifier:
+```
+algorithm='SAMME.R',
+base_estimator=None,
+learning_rate=1.0,
+n_estimators=5,
+random_state=None
+```
+
+List of features with feature selection and engineered features:
+```
+features_list = ["poi",
+                 "salary",
+                 "total_payments",
+                 "bonus",
+                 "deferred_income",
+                 "total_stock_value",
+                 "expenses",
+                 "exercised_stock_options",
+                 "other",
+                 "long_term_incentive",
+                 "restricted_stock",
+                 "to_messages",
+                 "from_poi_to_this_person",
+                 "from_messages",
+                 "from_this_person_to_poi",
+                 "shared_receipt_with_poi",
+                 "f_bonus",
+                 "f_salary",
+                 "f_stock",
+                 "r_from",
+                 "r_to"
+                 ]
+```
+
+Under these conditions the algorithm performed at its best, getting the following metrics:
+
+* Accuracy: 85%
+* Precision: 42%
+* Recall: 22%
 
 
+Remarkably it got a pretty high accuracy, the best among the three tested algorithms, despite it felt short in terms of precision and accuracy.
 
+It got a precision of more than 42%, which means that out of all the items labeled as positive, how many the algorithm identified as truly belong to the positive class.
 
-[relevant rubric items: ]
+On the other hand, the recall, refers to out of all the items that are truly positive, how many were correctly classified as positive, or simply put, how many positive items were 'recalled' from the dataset. In this plane, the algorithm didn't perform as great.
 
+In other words, the 42% precision means that out of 100 people the algorithm predicted to be POIs, only 42 of them were actually POIs (true positives). On the other hand, the 22% recall means that out of those 100 true positives in the dataset, the algorithm would have only identified 22 of them.
 
-
-What is validation, and what’s a classic mistake you can make if you do it wrong? How did you validate your analysis?  [relevant rubric items: “discuss validation”, “validation strategy”]
-
-
-
-Give at least 2 evaluation metrics and your average performance for each of them.  Explain an interpretation of your metrics that says something human-understandable about your algorithm’s performance. [relevant rubric item: “usage of evaluation metrics”]
+One of the main reasons the recall could potentially be that low is because having imbalanced classes (many more non-POIs than POIs) introduces some special challenges. For example, the algorithm can just guess the more common class label for every point, not a very insightful strategy, and still get pretty good accuracy, but no a great recall.

@@ -1,13 +1,7 @@
 #!/usr/bin/pickle
 
-""" a basic script for importing student's POI identifier,
-    and checking the results that they get from it 
- 
-    requires that the algorithm, dataset, and features list
-    be written to my_classifier.pkl, my_dataset.pkl, and
-    my_feature_list.pkl, respectively
-
-    that process should happen at the end of poi_id.py
+"""
+Script to import POI identifier, and check the results.
 """
 
 import pickle
@@ -22,27 +16,28 @@ Recall: {:>0.{display_precision}f}\tF1: {:>0.{display_precision}f}\tF2: {:>0.{di
 RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\
 \tFalse negatives: {:4d}\tTrue negatives: {:4d}"
 
-def test_classifier(clf, dataset, feature_list, folds = 1000):
-    data = featureFormat(dataset, feature_list, sort_keys = True)
+
+def test_classifier(clf, dataset, feature_list, folds=1000):
+    data = featureFormat(dataset, feature_list, sort_keys=True)
     labels, features = targetFeatureSplit(data)
-    cv = StratifiedShuffleSplit(labels, folds, random_state = 42)
+    cv = StratifiedShuffleSplit(labels, folds, random_state=42)
     true_negatives = 0
     false_negatives = 0
     true_positives = 0
     false_positives = 0
-    for train_idx, test_idx in cv: 
+    for train_idx, test_idx in cv:
         features_train = []
         features_test  = []
         labels_train   = []
         labels_test    = []
         for ii in train_idx:
-            features_train.append( features[ii] )
-            labels_train.append( labels[ii] )
+            features_train.append(features[ii])
+            labels_train.append(labels[ii])
         for jj in test_idx:
-            features_test.append( features[jj] )
-            labels_test.append( labels[jj] )
-        
-        ### fit the classifier using training set, and test on test set
+            features_test.append(features[jj])
+            labels_test.append(labels[jj])
+
+        # Fit the classifier using training set, and test on test set
         clf.fit(features_train, labels_train)
         predictions = clf.predict(features_test)
         for prediction, truth in zip(predictions, labels_test):
@@ -74,9 +69,11 @@ def test_classifier(clf, dataset, feature_list, folds = 1000):
         print "Got a divide by zero when trying out:", clf
         print "Precision or recall may be undefined due to a lack of true positive predicitons."
 
+
 CLF_PICKLE_FILENAME = "my_classifier.pkl"
 DATASET_PICKLE_FILENAME = "my_dataset.pkl"
 FEATURE_LIST_FILENAME = "my_feature_list.pkl"
+
 
 def dump_classifier_and_data(clf, dataset, feature_list):
     with open(CLF_PICKLE_FILENAME, "w") as clf_outfile:
@@ -85,6 +82,7 @@ def dump_classifier_and_data(clf, dataset, feature_list):
         pickle.dump(dataset, dataset_outfile)
     with open(FEATURE_LIST_FILENAME, "w") as featurelist_outfile:
         pickle.dump(feature_list, featurelist_outfile)
+
 
 def load_classifier_and_data():
     with open(CLF_PICKLE_FILENAME, "r") as clf_infile:
@@ -95,11 +93,13 @@ def load_classifier_and_data():
         feature_list = pickle.load(featurelist_infile)
     return clf, dataset, feature_list
 
+
 def main():
-    ### load up student's classifier, dataset, and feature_list
+    # Load up student's classifier, dataset, and feature_list
     clf, dataset, feature_list = load_classifier_and_data()
-    ### Run testing script
+    # Run testing script
     test_classifier(clf, dataset, feature_list)
+
 
 if __name__ == '__main__':
     main()
