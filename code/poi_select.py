@@ -3,7 +3,7 @@
 import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
-import tester
+import tester, poi_tune
 
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -12,35 +12,31 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.cross_validation import train_test_split
 
 
-def test_clf(d, features_list, test_size, random_state=42):
+def test_clf(d, features_list, random_state=42):
     """
-    Prints the accuracy, precision and recall for a given classifier.
+    Returns the classifier performance under different train / test ratios.
     """
     # Keep only the values from features_list
     data = featureFormat(d, features_list, sort_keys=True)
     # Split between labels (poi) and the rest of features
     labels, features = targetFeatureSplit(data)
 
-    # Create both training and test sets through split_data()
-    features_train, features_test, labels_train, labels_test = split_data(
-        features,
-        labels,
-        test_size,
-        random_state)
+    test_sizes = [0.2, 0.4, 0.6]
 
-    classifier = ["ADA", "RF", "SVM"]
-    for c in classifier:
-        if c == "ADA":
-            clf = AdaBoostClassifier()
-        elif c == "RF":
-            clf = RandomForestClassifier()
-        elif c == "SVM":
-            clf = SVC()
+    for test_size in test_sizes:
+        # Create both training and test sets through split_data()
+        features_train, features_test, labels_train, labels_test = split_data(
+            features,
+            labels,
+            test_size,
+            random_state)
+
+        clf = poi_tune.get_svc(d, features_list)
 
         clf.fit(features_train, labels_train)
         pred = clf.predict(features_test)
 
-        print "# CLASSIFIER:", c
+        print "# METRICS FOR TEST SIZE OF:", test_size
         acc = accuracy_score(labels_test, pred)
         print "* Accuracy:", acc
 
@@ -95,12 +91,14 @@ def feature_importances(d, features_list, test_size, random_state=42):
         test_size,
         random_state)
 
-    classifier = ["ADA", "RF"]
+    classifier = ["ADA", "RF", "SVC"]
     for c in classifier:
         if c == "ADA":
             clf = AdaBoostClassifier()
         elif c == "RF":
             clf = RandomForestClassifier()
+        elif c == "SVM":
+            clf = SVC(kernel='linear', max_iter=1000)
 
         result = []
         clf.fit(features_train, labels_train)
