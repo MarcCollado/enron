@@ -19,6 +19,7 @@ print_plot = False
 print_explore = False
 print_select = False
 print_tune = False
+print_validate = True
 
 # Load the dictionary containing the dataset
 with open("../data/final_project_dataset.pkl", "r") as data_file:
@@ -89,8 +90,8 @@ if print_select:
     # tester.test_classifier(clf_AB, data_dict, feat_1)
     clf_RF = RandomForestClassifier()
     # tester.test_classifier(clf_RF, data_dict, feat_1)
-    clf_SVC = SVC()
-    # tester.test_classifier(clf_RF, data_dict, feat_1)
+    clf_SVC = SVC(kernel='linear', max_iter=1000)
+    # tester.test_classifier(clf_SVC, data_dict, feat_1)
     print "\n"
 
 # Updated feature list, removed features w/ +60% NaNs
@@ -103,7 +104,7 @@ if print_select:
     # tester.test_classifier(clf_AB, data_dict, feat_2)
     clf_RF = RandomForestClassifier()
     # tester.test_classifier(clf_RF, data_dict, feat_2)
-    clf_SVC = SVC()
+    clf_SVC = SVC(kernel='linear', max_iter=1000)
     # tester.test_classifier(clf_SVC, data_dict, feat_2)
     print "\n"
 
@@ -141,63 +142,32 @@ feat_3 = features_db.feat_3
 if print_select:
     print "Settings: \n* Features: add engineered features \n* Tuning: default"
     clf_AB = AdaBoostClassifier()
-    tester.test_classifier(clf_AB, data_dict, feat_3)
+    # tester.test_classifier(clf_AB, data_dict, feat_3)
     clf_RF = RandomForestClassifier()
-    tester.test_classifier(clf_RF, data_dict, feat_3)
-    clf_SVC = SVC()
-    tester.test_classifier(clf_RF, data_dict, feat_3)
+    # tester.test_classifier(clf_RF, data_dict, feat_3)
+    clf_SVC = SVC(kernel='linear', max_iter=1000)
+    # tester.test_classifier(clf_SVC, data_dict, feat_3)
     print "\n"
 
-# Get Accuracy, Precision and Recall from the three algorithms
+# Get the importance of each feature
 if print_select:
-    poi_select.test_clf(data_dict, feat_3, 0.2)
+    poi_select.feature_importances(data_dict, feat_3, 0.35)
 
-# Get the importance of each feature for AB and RF
+# Remove less important features from feature_importances_
+feat_4AB = features_db.feat_4AB
+feat_4RF = features_db.feat_4RF
+feat_4SVC = features_db.feat_4SVC
+
+# Get new performance with feat_4*
 if print_select:
-    poi_select.feature_importances(data_dict, feat_3, 0.2)
-
-# Optimized feature set for AdaBoost
-features_list_AB = ["poi",
-                    "salary",
-                    "bonus",
-                    "deferred_income",
-                    "total_stock_value",
-                    "expenses",
-                    "exercised_stock_options",
-                    "long_term_incentive",
-                    "restricted_stock",
-                    "from_poi_to_this_person",
-                    "from_this_person_to_poi",
-                    "shared_receipt_with_poi",
-                    "f_bonus",
-                    "f_stock",
-                    "r_from",
-                    "r_to"
-                    ]
-
-# Optimized feature set for RandomForest
-features_list_RF = ["poi",
-                    "salary",
-                    "total_payments",
-                    "deferred_income",
-                    "total_stock_value",
-                    "expenses",
-                    "other",
-                    "long_term_incentive",
-                    "from_poi_to_this_person",
-                    "from_this_person_to_poi",
-                    "shared_receipt_with_poi",
-                    "f_bonus",
-                    "f_salary",
-                    "f_stock",
-                    "r_from",
-                    "r_to"
-                    ]
-
-# Get Accuracy, Precision and Recall with the optimized dataset
-if print_select:
-    poi_select.test_clf(data_dict, features_list_AB, 0.2)
-    poi_select.test_clf(data_dict, features_list_RF, 0.2)
+    print "Settings: \n* Features: .feature_importances_ \n* Tuning: default"
+    clf_AB = AdaBoostClassifier()
+    tester.test_classifier(clf_AB, data_dict, feat_4AB)
+    clf_RF = RandomForestClassifier()
+    tester.test_classifier(clf_RF, data_dict, feat_4RF)
+    clf_SVC = SVC(kernel='linear', max_iter=1000)
+    tester.test_classifier(clf_SVC, data_dict, feat_4SVC)
+    print "\n"
 
 
 # PART 3: Algorithm Tuning
@@ -205,13 +175,17 @@ if print_select:
 
 # Fine tune the classifiers
 if print_tune:
-    poi_tune.rf_tune(data_dict, feat_3, True)
-    poi_tune.ab_tune(data_dict, feat_3, True)
-    poi_tune.svc_tune(data_dict, feat_3)
+    poi_tune.ab_tune(data_dict, feat_4AB, True)
+    poi_tune.rf_tune(data_dict, feat_4RF, True)
+    poi_tune.svc_tune(data_dict, feat_4SVC)
 
 # Code Review: store to my_dataset and my_features for easy export below
-my_clf = AdaBoostClassifier(n_estimators=50)
+my_clf = poi_tune.get_svc(data_dict, feat_4SVC)
 my_dataset = data_dict
-my_features = features_db.feat_3
+my_features = feat_4SVC
 
 dump_classifier_and_data(my_clf, my_dataset, my_features)
+
+# Validate the algorithm
+if print_validate:
+    poi_select.test_clf(data_dict, feat_4SVC, random_state=42)
