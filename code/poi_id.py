@@ -19,7 +19,7 @@ print_plot = False
 print_explore = False
 print_select = False
 print_tune = False
-print_validate = True
+print_validate = False
 
 # Load the dictionary containing the dataset
 with open("../data/final_project_dataset.pkl", "r") as data_file:
