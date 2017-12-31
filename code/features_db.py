@@ -66,7 +66,7 @@ feat_3 = [
     "from_poi_to_this_person",
     "from_messages",
     "from_this_person_to_poi",
-    "shared_receipt_with_poi"
+    "shared_receipt_with_poi",
     "f_bonus",
     "f_salary",
     "f_stock",
