@@ -48,7 +48,7 @@ The printing variables themselves are also segmented. The gist of it being that 
 From a functionality perspective, all the work is done regardless of these switches, then its use is merely cosmetic and should not affect the final results.
 
 ## Data Exploration
-> Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the dataset and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?
+> Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the data set and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?
 
 The main goal of this project is to use both financial and email data from Enron to build a predictive model that could potentially identify a "person of interest" (POI), i.e. Enron employees who may have committed fraud, based on the aforementioned public data.
 
@@ -84,7 +84,7 @@ Additionally, the features always fall into three major types:
 * POI labels (boolean, represented as integer):
   * `poi`
 
-Here's a real example extracted from the dataset.
+Here's a real example extracted from the data set.
 ```
 "SKILLING JEFFREY K":
   {'salary': 1111258,
@@ -110,7 +110,7 @@ Here's a real example extracted from the dataset.
   'from_poi_to_this_person': 88}
 ```
 
-A quick overview of the dataset provides some highlights about its structure and main characteristics:
+A quick overview of the data set provides some highlights about its structure and main characteristics:
 
 * Financial features: 14
 * Email features: 6
@@ -120,7 +120,7 @@ A quick overview of the dataset provides some highlights about its structure and
 * Percentage of POI: 12.3%
 
 ### NaNs
-Despite overall having really valuable information in order to identify POIs, the dataset also contained a lot of missing values — NaN.
+Despite overall having really valuable information in order to identify POIs, the data set also contained a lot of missing values — NaN.
 
 Here's a table showing the amount of NaN values per feature.
 
@@ -193,7 +193,7 @@ With `get_incompletes()` set at 90%, which means that the persons returned by th
  'GRAMM WENDY L']
 ```
 
-After inspecting closely each person one by one, there's no meaningful information we can derive from these persons and on top of that, none of each is a POI, therefore, they will be removed from the dataset.
+After inspecting closely each person one by one, there's no meaningful information we can derive from these persons and on top of that, none of each is a POI, therefore, they will be removed from the data set.
 
 **Additional Plots**
 
@@ -229,7 +229,7 @@ Despite they can't be considered outliers, since the values stay within a reason
 
 After close inspection of the rest of the features, the same names keep showing up. If we wouldn't know part of the story, some persons — like `LAY KENNETH L` and `SKILLING JEFFREY K`, would probably classify as outliers. Even after removing `TOTAL`, they keep showing up at the higher band of all the financial related plots, like `total_payments`. But since they played a key role in the development of the story, they must stay, and with that the outlier inspection should be considered completed.
 
-Finally, the updated dataset that will be used for the upcoming sections has the following characteristics:
+Finally, the updated data set that will be used for the upcoming sections has the following characteristics:
 
 * Dataset length: 140
 * Number of POI: 18
@@ -237,47 +237,56 @@ Finally, the updated dataset that will be used for the upcoming sections has the
 
 
 ## Selected Features
-> What features did you end up using in your POI identifier, and what selection process did you use to pick them? Did you have to do any scaling? Why or why not? As part of the assignment, you should attempt to engineer your own feature that does not come ready-made in the dataset -- explain what feature you tried to make, and the rationale behind it.
+> What features did you end up using in your POI identifier, and what selection process did you use to pick them? Did you have to do any scaling? Why or why not? As part of the assignment, you should attempt to engineer your own feature that does not come ready-made in the data set -- explain what feature you tried to make, and the rationale behind it.
 
 ### Pre Assessment
 Before jumping straight into engineering and selecting features or even scaling algorithms, lets assess first out of the box the performance of three different algorithms (decided upon [documentation](http://scikit-learn.org/stable/tutorial/machine_learning_map/) from `sklearn`). The goal is to use the results yielded in this section as a base line to benchmark once the new features are added or the scaling is performed.
 
 The three selected algorithms are:
 
-* [Adaboost](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html)
+* [AdaBoost](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html)
 * [Random Forest](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier)
 * [SVC](http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC)
 
-#### Out of the Box Performance
-These are the Accuracy, Precision and Recall values for the three algorithms with the default features and no scaling. Test size was set at 20%.
+#### Performance Review: out of the box
+These are Accuracy, Precision and Recall values for the three algorithms with the default parameters, features and no scaling. They have been calculated using the `test_classifier()` function found in `tester.py`.
 
 **AdaBoost**
-* Accuracy: 0.857142857143
-* Precision: 0.666666666667
-* Recall: 0.4
-
+* Accuracy: 0.83193
+* Precision: 0.38098
+* Recall: 0.28250
 **RandomForest**
-* Accuracy: 0.857142857143
-* Precision: 1.0
-* Recall: 0.2
-
+* Accuracy: 0.84943
+* Precision: 0.41290
+* Recall: 0.12800
 **SVM**
-* Accuracy: 0.821428571429
-* Precision: 0.0
-* Recall: 0.0
+* Accuracy: N/A
+* Precision: N/A
+* Recall: N/A
 
-Both AdaBoost and RandomForest got the best accuracy, closely followed by SVM. Precision was also hire in the case of AdaBoost and RandomForest, but Recall of AdaBoost was better by a factor of x2. SVM didn't get neither Precision nor Recall scores. The issue will be further explored.
+Both AdaBoost and RandomForest got a really good Accuracy out of the box. They also got similar values for Precision, around 40%, but both felt short when it comes to Recall, under 30%.
+
+This means that out of all the items that are truly positive, i.e. POI, how many were correctly classified as positive. Or simply put, how many positive items were 'recalled' from the data set.
+
+Finally, SVM threw out this error out of the box with `kernel:'rbf'`:
+
+```
+Precision or recall may be undefined due to a lack of true positive predictions.
+
+```
+
+Twisting a little bit some parameters by hand showed that changing the kernel to `poly` got rid of the error and calculated its performance correctly.
 
 The idea here was mainly to set these values as a benchmark to see how feature selection, feature engineering and scaling affected the results.
 
 ### Feature Pre Selection
-Going back to the table that displayed the amount of NaNs per feature, is clear that no features have information for each employee in the dataset. Up to five features have more than 60% missing values, but if that was not enough, `restricted_stock_deferred`, `director_fees`, `loan_advances` and `deferral_payments` features are missing for more than 50% of the POI segment.
+Going back to the table that displayed the amount of NaNs per feature, is clear that there are no features that have information for all the employees in the data set. Despite, up to five features have more than 60% missing values. If that was not enough, `restricted_stock_deferred`, `director_fees`, `loan_advances` and `deferral_payments` features are missing for more than 50% of the POI segment.
 
 As a result, these four features and `restricted_stock_deferred` — with over 85% of NaN, will be omitted from the selection process.
 
 Additionally, the `email_address` feature will also be left out since it is text based, and hardly provides any predictive value.
 
-These are the base features that will be used alongside `scikit-learn`'s `SelectKBest` module to compute the 10 most influential features.
+These are the updated set of features, removing the ones with higher rate of incompleteness, its respective list can be found at `features_db.py`, under the name of `feat_2`.
 
 * Financial features:
   * `salary`
@@ -296,6 +305,24 @@ These are the base features that will be used alongside `scikit-learn`'s `Select
   * `from_messages`
   * `from_this_person_to_poi`
   * `shared_receipt_with_poi`
+
+#### Performance Review: remove features with more than 60% NaNs
+Here are the new metrics obtained by removing the features with more than 60% missing values, that were not adding value and could potentially cause noise in the results.
+
+**AdaBoost**
+* Accuracy: 0.83279
+* Precision: 0.38580
+* Recall: 0.28800
+**RandomForest**
+* Accuracy: 0.84536
+* Precision: 0.36967
+* Recall: 0.11700
+**SVM**
+* Accuracy: N/A
+* Precision: N/A
+* Recall: N/A
+
+The removal of these features yield almost identical results for AdaBoost, but it saw a drop in both Precision and Recall for RandomForest. Which suggests that it is not a good idea to get rid the aforementioned features.
 
 ### Feature Engineering
 The combination of several features, both financial and email, provide a richer view of the whole situation. After analyzing and plotting different possibilities, these are the new features created that derived the most value:
@@ -417,7 +444,7 @@ As further experimentation, the five less important features will be removed for
 * Precision: 0.666666666667
 * Recall: 0.4
 
-Removing the less important features had a great positive impact on the AdaBoost algorithm, with more than a 10% higher accuracy and more than double its precision.
+Removing the less important features had a great positive impact on the AdaBoost algorithm, with more than a 10% higher Accuracy and more than double its precision.
 
 On the other hand, RandomForest almost didn't see any changes, but a small drop in Accuracy, which was already the highest using the prior feature set.
 
@@ -446,9 +473,9 @@ They were tested using `rf_tune()` and `ab_tune()` respectively. Tests were perf
 
 Also `n_estimators` parameter was iterated, with values ranging from 1 to 200. The sweet spot was found around 3 and 10, being 5 the value that yielded the best results.
 
-Finally, several scores were test against. The one that produced the best results was `F1`, which stroke a healthy balance between recall and precision. This fact shouldn't come as a surprise since this is its main definition, according to the Wikipedia:
+Finally, several scores were test against. The one that produced the best results was `F1`, which stroke a healthy balance between Recall and precision. This fact shouldn't come as a surprise since this is its main definition, according to the Wikipedia:
 
-> F1 score considers both the precision p and the recall r of the test to compute the score. [...] Is the harmonic average of the precision and recall, where an F1 score reaches its best value at 1 (perfect precision and recall) and worst at 0.
+> F1 score considers both the precision p and the Recall r of the test to compute the score. [...] Is the harmonic average of the precision and Recall, where an F1 score reaches its best value at 1 (perfect precision and Recall) and worst at 0.
 
 It is also worth noting that both samples, with or without scaler, produced the same parameters. Here's a code snippet of the best estimator derived from Pipeline, both for RandomForest and AdaBoost.
 
@@ -575,12 +602,12 @@ Under these conditions the algorithm performed at its best, getting the followin
 * Recall: 22%
 
 
-Remarkably it got a pretty high accuracy, the best among the three tested algorithms, despite it felt short in terms of precision and recall.
+Remarkably it got a pretty high Accuracy, the best among the three tested algorithms, despite it felt short in terms of precision and Recall.
 
 It got a precision of more than 42%, which means that out of all the items labeled as positive, how many the algorithm identified as truly belong to the positive class.
 
-On the other hand, the recall, refers to out of all the items that are truly positive, how many were correctly classified as positive, or simply put, how many positive items were 'recalled' from the dataset. In this plane, the algorithm didn't perform as great.
+On the other hand, the Recall, refers to out of all the items that are truly positive, how many were correctly classified as positive, or simply put, how many positive items were 'recalled' from the data set. In this plane, the algorithm didn't perform as great.
 
-In other words, the 42% precision means that out of 100 people the algorithm predicted to be POIs, only 42 of them were actually POIs (true positives). On the other hand, the 22% recall means that out of those 100 true positives in the dataset, the algorithm would have only identified 22 of them.
+In other words, the 42% precision means that out of 100 people the algorithm predicted to be POIs, only 42 of them were actually POIs (true positives). On the other hand, the 22% Recall means that out of those 100 true positives in the data set, the algorithm would have only identified 22 of them.
 
-One of the main reasons the recall could potentially be that low is because having imbalanced classes (many more non-POIs than POIs) introduces some special challenges. For example, the algorithm can just guess the more common class label for every point, not a very insightful strategy, and still get pretty good accuracy, but no a great recall.
+One of the main reasons the Recall could potentially be that low is because having imbalanced classes (many more non-POIs than POIs) introduces some special challenges. For example, the algorithm can just guess the more common class label for every point, not a very insightful strategy, and still get pretty good Accuracy, but no a great Recall.

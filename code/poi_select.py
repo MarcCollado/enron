@@ -3,6 +3,7 @@
 import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
+import tester
 
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import RandomForestClassifier
