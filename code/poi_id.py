@@ -17,7 +17,7 @@ from sklearn.svm import SVC
 # Switch to True to display the main features of the Exploration
 print_plot = False
 print_explore = False
-print_select = True
+print_select = False
 print_tune = False
 
 # Load the dictionary containing the dataset
@@ -89,8 +89,8 @@ if print_select:
     # tester.test_classifier(clf_AB, data_dict, feat_1)
     clf_RF = RandomForestClassifier()
     # tester.test_classifier(clf_RF, data_dict, feat_1)
-    clf_SVC = SVC(kernel='linear', C=1)
-    dump_classifier_and_data(clf_SVC, data_dict, feat_1)
+    clf_SVC = SVC()
+    # tester.test_classifier(clf_RF, data_dict, feat_1)
     print "\n"
 
 # Updated feature list, removed features w/ +60% NaNs
@@ -98,13 +98,14 @@ feat_2 = features_db.feat_2
 
 # Get new performance with feat_2
 if print_select:
-    print "Updated feature list: \n* Features: removed features w/ +60% NaNs \n* Tuning: default"
+    print "Settings: \n* Features: remove features w/ +60% NaN \n* Tuning: default"
     clf_AB = AdaBoostClassifier()
     # tester.test_classifier(clf_AB, data_dict, feat_2)
     clf_RF = RandomForestClassifier()
     # tester.test_classifier(clf_RF, data_dict, feat_2)
     clf_SVC = SVC()
     # tester.test_classifier(clf_SVC, data_dict, feat_2)
+    print "\n"
 
 # Create new engineered features
 # f_bonus
@@ -133,37 +134,27 @@ data_dict = poi_select.create_feature(data_dict,
                                       "to_messages",
                                       "r_to")
 
-# New dataset features with engineered features
-features_list = ["poi",
-                 "salary",
-                 "total_payments",
-                 "bonus",
-                 "deferred_income",
-                 "total_stock_value",
-                 "expenses",
-                 "exercised_stock_options",
-                 "other",
-                 "long_term_incentive",
-                 "restricted_stock",
-                 "to_messages",
-                 "from_poi_to_this_person",
-                 "from_messages",
-                 "from_this_person_to_poi",
-                 "shared_receipt_with_poi",
-                 "f_bonus",
-                 "f_salary",
-                 "f_stock",
-                 "r_from",
-                 "r_to"
-                 ]
+# Add new engineered features
+feat_3 = features_db.feat_3
+
+# Get new performance with feat_3
+if print_select:
+    print "Settings: \n* Features: add engineered features \n* Tuning: default"
+    clf_AB = AdaBoostClassifier()
+    tester.test_classifier(clf_AB, data_dict, feat_3)
+    clf_RF = RandomForestClassifier()
+    tester.test_classifier(clf_RF, data_dict, feat_3)
+    clf_SVC = SVC()
+    tester.test_classifier(clf_RF, data_dict, feat_3)
+    print "\n"
 
 # Get Accuracy, Precision and Recall from the three algorithms
 if print_select:
-    poi_select.test_clf(data_dict, features_list, 0.2)
+    poi_select.test_clf(data_dict, feat_3, 0.2)
 
 # Get the importance of each feature for AB and RF
 if print_select:
-    poi_select.feature_importances(data_dict, features_list, 0.2)
+    poi_select.feature_importances(data_dict, feat_3, 0.2)
 
 # Optimized feature set for AdaBoost
 features_list_AB = ["poi",
@@ -214,34 +205,13 @@ if print_select:
 
 # Fine tune the classifiers
 if print_tune:
-    poi_tune.rf_tune(data_dict, features_list, True)
-    poi_tune.ab_tune(data_dict, features_list, True)
-    poi_tune.svc_tune(data_dict, features_list)
+    poi_tune.rf_tune(data_dict, feat_3, True)
+    poi_tune.ab_tune(data_dict, feat_3, True)
+    poi_tune.svc_tune(data_dict, feat_3)
 
 # Code Review: store to my_dataset and my_features for easy export below
-# my_clf = AdaBoostClassifier(n_estimators=50)
-# my_dataset = data_dict
-# my_features = ["poi",
-#                "salary",
-#                "total_payments",
-#                "bonus",
-#                "deferred_income",
-#                "total_stock_value",
-#                "expenses",
-#                "exercised_stock_options",
-#                "other",
-#                "long_term_incentive",
-#                "restricted_stock",
-#                "to_messages",
-#                "from_poi_to_this_person",
-#                "from_messages",
-#                "from_this_person_to_poi",
-#                "shared_receipt_with_poi",
-#                "f_bonus",
-#                "f_salary",
-#                "f_stock",
-#                "r_from",
-#                "r_to"
-#                ]
-#
-# dump_classifier_and_data(my_clf, my_dataset, my_features)
+my_clf = AdaBoostClassifier(n_estimators=50)
+my_dataset = data_dict
+my_features = features_db.feat_3
+
+dump_classifier_and_data(my_clf, my_dataset, my_features)
