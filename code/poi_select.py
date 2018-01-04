@@ -11,6 +11,10 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.cross_validation import train_test_split
 
+from sklearn import preprocessing
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
 
 def test_clf(d, features_list, random_state=42):
     """
@@ -114,6 +118,46 @@ def feature_importances(d, features_list, test_size, random_state=42):
         print "# FEATURE IMPORTANCE:", c
         print result
         print "\n"
+
+    return
+
+
+def kbest(data_dict, features_list):
+    """
+    Prints an ordered array with k best features based on SelectKBased.
+    """
+    # Keep only the values from features_list
+    data = featureFormat(data_dict, features_list, sort_keys=True)
+    # Split between labels (poi) and the rest of features
+    labels, features = targetFeatureSplit(data)
+
+    # Set up the scaler
+    minmax_scaler = preprocessing.MinMaxScaler()
+    features_minmax = minmax_scaler.fit_transform(features)
+
+    # Use SelectKBest to tune for k
+    k_best = SelectKBest(chi2, k=10)
+
+    # Use the instance to extract the k best features
+    features_kbest = k_best.fit_transform(features_minmax, labels)
+
+    feature_scores = ['%.2f' % elem for elem in k_best.scores_]
+
+    # Get SelectKBest pvalues, rounded to 3 decimal places
+    feature_scores_pvalues = ['%.3f' % elem for elem in k_best.pvalues_]
+
+    # Get SelectKBest feature names, from 'K_best.get_support',
+    # Create an array of feature names, scores and pvalues
+    k_features = [(features_list[i+1],
+                   feature_scores[i],
+                   feature_scores_pvalues[i]) for i in k_best.get_support(indices=True)]
+
+    # Sort the array by score
+    k_features = sorted(k_features, key=lambda f: float(f[1]))
+
+    print "# KBEST FEATURES:"
+    print k_features
+    print "\n"
 
     return
 

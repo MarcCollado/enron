@@ -76,6 +76,22 @@ feat_3 = [
     ]
 
 
+# feat_K - 10 most important features from SelectKBest
+feat_K = [
+    "poi",
+    "director_fees",
+    "other",
+    "shared_receipt_with_poi",
+    "long_term_incentive",
+    "total_payments",
+    "salary",
+    "bonus",
+    "total_stock_value",
+    "loan_advances",
+    "exercised_stock_options"
+]
+
+
 # feat_3 - AB non imporant features from feature_importances_
 feat_4AB = [
     "poi",

@@ -149,7 +149,25 @@ if print_select:
     # tester.test_classifier(clf_SVC, data_dict, feat_3)
     print "\n"
 
-# Get the importance of each feature
+# Get the most important features based on SelectKBest
+if print_select:
+    poi_select.kbest(data_dict, feat_1)
+
+# New feature list with 10 most important features from SelectKBest
+feat_K = features_db.feat_K
+
+# Get new performance with feat_K
+if print_select:
+    print "Settings: \n* Features: SelectKBest \n* Tuning: default"
+    clf_AB = AdaBoostClassifier()
+    # tester.test_classifier(clf_AB, data_dict, feat_K)
+    clf_RF = RandomForestClassifier()
+    # tester.test_classifier(clf_RF, data_dict, feat_K)
+    clf_SVC = SVC(kernel='linear', max_iter=1000)
+    # tester.test_classifier(clf_SVC, data_dict, feat_K)
+    print "\n"
+
+# Get the importance of each feature from feature_importances_
 if print_select:
     poi_select.feature_importances(data_dict, feat_3, 0.35)
 
