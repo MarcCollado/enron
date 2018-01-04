@@ -425,7 +425,7 @@ As further experimentation, the five less important features will be removed fro
 * Precision: 0.12769
 * Recall: 0.54950
 
-This time each algorithm had a specific, distinct, feature set crafted for itself. And overall, removing the less important features for each classifier had a great positive impact, specially on AdaBoost, with which saw almost 20% increase in Recall, its weakest metric at the time.
+This time each algorithm had a specific, distinct, feature set crafted for itself. And overall, removing the less important features for each classifier had a great positive impact, specially on AdaBoost, which saw almost 20% increase in Recall, its weakest metric at the time.
 
 On the other hand, RandomForest almost didn't see any changes, but a small bump in Accuracy, which was already at par with AdaBoost. On the other hand, this classifier is still showing a lot of trouble when it comes to Recall.
 
@@ -438,13 +438,24 @@ That being said, so far the best performing algorithm has been AdaBoost, featuri
 
 First of all, in order to support feature scaling and parameter tuning, `sklearn`'s `Pipeline` and `GridSearchCV` modules will be implemented.
 
-Every machine learning algorithm has several parameters at its disposal in order to model the results depending on the situation is dealing with. Some of it has been already discussed in the first performance review where an infinite loop was fixed by tweaking `max_iter` in the SVC classifier.
+Every machine learning algorithm has several parameters at its disposal in order to model the results depending on the situation at hand. Some of it has been already discussed in the first performance review where an infinite loop was fixed by tweaking `max_iter` in the SVC classifier.
 
-Parameter tuning is a really important craft when it comes to analyze data sets through machine learning algorithms. Since each data set has its own uniqueness, it has to be tackled under a specific set of conditions or parameters in order to yield optimal results.
+Parameter tuning is a really important craft when it comes to analyze data sets through machine learning algorithms. Since each data set has its own uniqueness, it has to be tackled under a specific set of conditions or combination of parameters in order to yield optimal results.
 
-Then the goal of researchers and ML practitioners is to find the parameters that yield optimal performance for each circumstance or data set. Of course this task can be done manually, as seen in the previous sections, but in some occasions the the amount of parameter combinations can be overwhelming. Here's where `GridSearchCV` enters the picture.
+### The Dangers of Overfitting
+But parameter tuning can be tricky, though. If not done well, we can end up with an algorithm that correctly classifies our data, but is erratic at many other places. That happens when the data is taken too literally and our machine learning algorithm produces an extremely complex model that doesn't generalize well. This phenomena is called overfitting and it is something any machine learning practitioner should always keep an eye on.
 
-`GridSearchCV` module automates this process by recursively testing several parameter combination and finally, provide the most optimal result.
+For example, in its fundamental nature, an SVC classifier works by recursively drawing a boundary between different classes on the data, that maximizes the distance to the nearest point, also called the margin.
+
+Of course this boundary can be as simplistic as a straight line, which generalizes well but doesn't yield optimal results out of a particular situation, or as twisted and complex as we can imagine, which could perfectly match our current model, but it wouldn't fit other situations.
+
+Doubling down on the SVC example, a classifier tuned with a linear kernel and high values of gamma (which defines how far the influence of a single point reaches), would produce seemingly linear cuts to the data, that could have the potential to work on many sets, but hardly yield optimal performance in any particular situation.
+
+On the other hand, if tuning an SVC with an RBF kernel and lower values of gamma, will inevitably produce a twisted, wiggled boundary with an exceptional fit for that particular situation, that won't be useful if changes in the data structure are enforced. Our classifier would be somehow biased by the data and that's a clear example of overfitting.
+
+Then the our goal here is to find and tune the parameters that yield optimal performance for this particular case. Of course this task can be done manually, as seen in the previous sections, but in some occasions the the amount of parameter combinations can be overwhelming and the process can take a lot of time. Here's where `GridSearchCV` enters the picture.
+
+`GridSearchCV` module automates the testing by recursively trying several parameter combination and finally, pick the most optimal result.
 
 ### RandomForest and AdaBoost
 The tune process for both algorithms has been similar, and the results almost identical.
