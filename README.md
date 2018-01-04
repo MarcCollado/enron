@@ -381,10 +381,52 @@ RandomForest also saw improvements across the board, with more than 10% increase
 
 Finally, things were no better for SVC, which is still struggling with Accuracy and Precision, with the worst results among the three.
 
-Since AdaBoost and RandomForest showed the best overall results with the new engineered features, they will be used during the upcoming sections of the project.
+### SelectKBest
+Yet another approach to automate the feature selection process is using the `scikit` library `SelectKBest`. This function basically select features according to the k highest scores, passed as a parameter.
+
+The `kbest()` function implements this method and returns a list with the ten most important features according to `SelectKBest`. Here are the results sorted by its importances or `pscore` — the 3 decimal number — output from the function:
+
+```
+[
+('director_fees', '1.41', '0.235'),
+('other', '1.64', '0.200'),
+('shared_receipt_with_poi', '2.28', '0.131'),
+('long_term_incentive', '2.42', '0.120'),
+('total_payments', '2.69', '0.101'),
+('salary', '2.86', '0.091'),
+('bonus', '4.90', '0.027'),
+('total_stock_value', '5.28', '0.022'),
+('loan_advances', '6.53', '0.011'),
+('exercised_stock_options', '6.61', '0.010')
+]
+```
+
+#### Performance Review: SelectKBest
+After running `kbest()`, its feature list was tested with the three classifiers and yielded the following results:
+
+**AdaBoost**
+* Accuracy: 0.82036
+* Precision: 0.29284
+* Recall: 0.18200
+
+**RandomForest**
+* Accuracy: 0.84764
+* Precision: 0.40459
+* Recall: 0.14100
+
+**SVC**
+* Accuracy: 0.50757
+* Precision: 0.15241
+* Recall: 0.53650
+
+The new set of features `feat_K` didn't perform well in AdaBoost or RandomForest, which both saw drops in Accuracy and Precision, and mixed results for Recall. But in any case, boosting its values in a meaningful way.
+
+SVC was almost agnostic to the implementation of the features from `SelectKBest` and its performance metrics stayed almost the same across the board.
 
 ### feature_importances_
-In order to get in depth with feature selection, `feature_importances_` has been used in order to understand which features are having the most impact in the final results. Below the results for each algorithm:
+It seems that nor a more manual approach, with the notable exception of Feature Engineering, neither an algorithm based selection have had a significant impact on the performance so far.
+
+This time around feature selection will be tackled from the other end, removing the less important features. `feature_importances_` will be used in order to understand which features are having the most impact in the final results. Below the results for each algorithm:
 
 **AdaBoost**
 ```
