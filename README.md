@@ -1,6 +1,13 @@
 # Identify Fraud From Enron Email
 Machine Learning Project — Udacity Data Analyst Nanodegree
 
+This project is part of the Data Analyst Nanodegree. Below you'll find the rest of the projects and I also wrote a [short post](https://collado.io/blog/2018/udacity-dand) about the experience.
+
+* [Exploratory data analysis](https://github.com/MarcCollado/wine)
+* [Data wrangling](https://github.com/MarcCollado/open-street-map)
+* [Machine learning](https://github.com/MarcCollado/enron)[3]
+* [Data visualization](https://public.tableau.com/profile/marccollado#!/vizhome/TitanicFinal_6/Titanic)
+
 ## Introduction
 In 2000, Enron was one of the largest companies in the United States. By 2002, it had collapsed into bankruptcy due to widespread corporate fraud. In the resulting Federal investigation, a significant amount of typically confidential information entered into the public record, including tens of thousands of emails and detailed financial data for top executives.
 
