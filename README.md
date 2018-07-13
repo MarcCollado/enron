@@ -5,7 +5,7 @@ This project is part of the Data Analyst Nanodegree. Below you'll find the rest 
 
 * [Exploratory data analysis](https://github.com/MarcCollado/wine)
 * [Data wrangling](https://github.com/MarcCollado/open-street-map)
-* [Machine learning](https://github.com/MarcCollado/enron)[3]
+* [Machine learning](https://github.com/MarcCollado/enron)
 * [Data visualization](https://public.tableau.com/profile/marccollado#!/vizhome/TitanicFinal_6/Titanic)
 
 ## Introduction
