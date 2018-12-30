@@ -1,20 +1,32 @@
-# Identify Fraud From Enron Email
+# Identifying Fraud From Enron 💰
 Machine Learning Project — Udacity Data Analyst Nanodegree
 
-This project is part of the Data Analyst Nanodegree. Below you'll find the rest of the projects and I also wrote a [short post](https://collado.io/blog/2018/udacity-dand) about the experience.
+This project belongs to Udacity's Data Analyst Nanodegree. Below you'll find the rest of the Nanodegree projects and I also wrote a [short post](https://www.collado.io/blog/2018/udacity-dand) in my blog about the course experience.
 
+* [Intro to data analysis](https://github.com/MarcCollado/titanic)
 * [Exploratory data analysis](https://github.com/MarcCollado/wine)
 * [Data wrangling](https://github.com/MarcCollado/open-street-map)
 * [Machine learning](https://github.com/MarcCollado/enron)
 * [Data visualization](https://public.tableau.com/profile/marccollado#!/vizhome/TitanicFinal_6/Titanic)
 
-## Introduction
+ℹ️ This project was developed in 2017 during the Nanodegree and it is no longer maintained. If you like to see what I'm currently working on, please, visit my [now page](https://www.collado.io/now).
+
+
+## About
 In 2000, Enron was one of the largest companies in the United States. By 2002, it had collapsed into bankruptcy due to widespread corporate fraud. In the resulting Federal investigation, a significant amount of typically confidential information entered into the public record, including tens of thousands of emails and detailed financial data for top executives.
 
-Using all the concepts and ideas learned through the *Introduction to Machine Learning* module within the Udacity's Data Analyst NanoDegree, this project will use the `scikit-learn` [Python library](http://scikit-learn.org/stable/) and machine learning techniques to predict and spot culpable persons of the Enron scandal.
+Using Machine Learning techniques this project will predict and spot culpable persons of the Enron scandal.
 
-## How The Project Works
-The project contains four main folders:
+
+## Tech Stack
+The project was built with:
+
+* Python 2.7
+* [scikit-learn library](http://scikit-learn.org/stable/)
+
+
+## File Structure
+The repository is structured as it follows, it contains four main folders, but the whole project is documented in this `README.md`, right after this section:
 
 * `code`: Python main scripts
 * `data`: data sets used throughout the project
@@ -54,6 +66,8 @@ All the printing functions called from `poi_id.py` are wrapped inside a conditio
 The printing variables themselves are also segmented. The gist of it being that if you wanted to print only the code from the Data Exploration phase, you should only "turn" the switch `print_explore` to `True`.
 
 From a functionality perspective, all the work is done regardless of these switches, then its use is merely cosmetic and should not affect the final results.
+
+---
 
 ## Data Exploration
 > Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the data set and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?
